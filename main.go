@@ -58,7 +58,7 @@ func main() {
 		handlers.GetMessagesBetween(c, db)
 	})
 
-	router.GET("/ws", func(c *gin.Context) {
+	router.GET("/ws", authMiddleware, func(c *gin.Context) {
 		handleWebSocketConnection(c, db)
 	})
 
