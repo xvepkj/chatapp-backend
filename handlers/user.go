@@ -3,6 +3,8 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
+
 	"github.com/gin-gonic/gin"
 	"github.com/xvepkj/chatapp-backend/db"
 	"github.com/xvepkj/chatapp-backend/models"
@@ -21,7 +23,58 @@ func CreateUser(c *gin.Context, dbConn *gorm.DB) {
 		return
 	}
 
+	token, err := generateJWTToken(user.UserName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		return
+	}
+
+	user.Token = token
+
 	c.JSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": user})
+}
+
+func GetUser(c *gin.Context, dbConn *gorm.DB) {
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	existingUser, err := db.GetUserByUsername(dbConn, user.UserName)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid cridentials"})
+		return
+	}
+
+	if existingUser.Password != user.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
+
+	token, err := generateJWTToken(user.UserName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		return
+	}
+
+	existingUser.Token = token
+	c.JSON(http.StatusCreated, gin.H{"message": "login successful", "user": existingUser})
+}
+
+func generateJWTToken(username string) (string, error) {
+	// Create a new JWT token with the appropriate signing method
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"authenticated_user": username,
+	})
+
+	// Sign the token with a secret key and get the complete encoded token string
+	tokenString, err := token.SignedString([]byte("signing-key"))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 func GetUserByID(c *gin.Context, dbConn *gorm.DB) {
