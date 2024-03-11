@@ -24,6 +24,15 @@ func AddMessage(c *gin.Context, dbConn *gorm.DB) {
 	c.JSON(http.StatusCreated, gin.H{"message": "message added successfully", "user": message})
 }
 
+func AddMessageWebSocket(dbConn *gorm.DB, message *models.Message) error {
+
+	if err := db.AddMessage(dbConn, message); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetMessagesBetween(c *gin.Context, dbConn *gorm.DB) {
 	senderID := c.Param("senderID")
 	receiverId := c.Param("receiverID")
