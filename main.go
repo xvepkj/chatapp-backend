@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/juju/ratelimit"
+	"github.com/rs/zerolog/log"
 	"github.com/xvepkj/chatapp-backend/handlers"
 	"github.com/xvepkj/chatapp-backend/models"
 	"github.com/xvepkj/chatapp-backend/utils"
@@ -82,6 +83,7 @@ func main() {
 		handleWebSocketConnection(c, db)
 	})
 
+	log.Info().Msg("Starting Server...")
 	router.Run()
 }
 
