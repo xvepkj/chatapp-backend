@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/juju/ratelimit"
 	"github.com/xvepkj/chatapp-backend/handlers"
 	"github.com/xvepkj/chatapp-backend/models"
 	"github.com/xvepkj/chatapp-backend/utils"
@@ -20,6 +21,23 @@ var upgrader = websocket.Upgrader{
 
 // Map to store WebSocket connections of users
 var userConnections = make(map[string]*websocket.Conn)
+
+// Initialize a rate limiter with a maximum of 50 requests per minute
+var limiter = ratelimit.NewBucketWithRate(60, 50)
+
+// RateLimitMiddleware applies rate limiting to incoming requests
+func RateLimitMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Check if the client's request rate exceeds the limit
+		if limiter.TakeAvailable(1) == 0 {
+			// Reject the request with a 429 Too Many Requests status code
+			c.AbortWithStatusJSON(429, gin.H{"error": "too many requests"})
+			return
+		}
+		// Continue to the next middleware or route handler
+		c.Next()
+	}
+}
 
 func main() {
 	db, err := utils.ConnectDB()
@@ -37,6 +55,8 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	router.Use(RateLimitMiddleware())
 
 	router.POST("/users/register", func(c *gin.Context) {
 		handlers.CreateUser(c, db)
