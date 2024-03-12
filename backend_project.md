@@ -1,6 +1,6 @@
 ### Backend Project
 
-Requirements : 
+**<u>Requirements : </u>**
 
 - My backend has a database - **OK**
 
@@ -22,17 +22,15 @@ Requirements :
 
 - you understand logging and alerts **OK**
 
-- I can write reports against the data in my database
+- I can output different file types from my database (excel, word, html emails, text) **OK**
+
+- I understand how to write and execute unit tests for my code
 
 - Authorization & roles
 
 - Can integrate with external identity providers (Google Oauth)
-
-- I can output different file types from my database (excel, word, html emails, text)
-
-- I understand how to write and execute unit tests for my code
   
-  You get extra bonus points if:
+  **You get extra bonus points if:**
 
 - you are good at technical documentation (can use swagger) **OK**
 
