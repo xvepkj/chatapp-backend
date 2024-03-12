@@ -12,6 +12,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Register new user
+// @Description Register a user with username and password
+// @Accept json
+// @Produce json
+// @Success 200 {string} string "User"
+// @Failure 400 {string} string "Bad Request"
+// @Router /users [post]
 func CreateUser(c *gin.Context, dbConn *gorm.DB) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {

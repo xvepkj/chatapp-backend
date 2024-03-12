@@ -9,6 +9,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/juju/ratelimit"
 	"github.com/rs/zerolog/log"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	docs "github.com/xvepkj/chatapp-backend/docs"
 	"github.com/xvepkj/chatapp-backend/handlers"
 	"github.com/xvepkj/chatapp-backend/models"
 	"github.com/xvepkj/chatapp-backend/utils"
@@ -55,6 +58,8 @@ func main() {
 		panic("failed to migrate database")
 	}
 
+	docs.SwaggerInfo.BasePath = "/"
+
 	router := gin.Default()
 
 	router.Use(RateLimitMiddleware())
@@ -82,6 +87,8 @@ func main() {
 	router.GET("/ws", authMiddleware, func(c *gin.Context) {
 		handleWebSocketConnection(c, db)
 	})
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	log.Info().Msg("Starting Server...")
 	router.Run()

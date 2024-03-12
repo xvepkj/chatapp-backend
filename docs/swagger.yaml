@@ -1,0 +1,21 @@
+info:
+  contact: {}
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Register a user with username and password
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Register new user
+swagger: "2.0"
