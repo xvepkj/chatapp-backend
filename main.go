@@ -84,6 +84,10 @@ func main() {
 		handlers.GetMessagesBetween(c, db)
 	})
 
+	router.GET("export/messages/:senderID/:receiverID", authMiddleware, func(c *gin.Context) {
+		handlers.ExportMessagesToExcel(c, db)
+	})
+
 	router.GET("/ws", authMiddleware, func(c *gin.Context) {
 		handleWebSocketConnection(c, db)
 	})
