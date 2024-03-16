@@ -140,9 +140,18 @@ func authMiddleware(c *gin.Context) {
 }
 
 func sendWebSocketMessage(message models.Message) {
+	messageJSON, err := json.Marshal(message)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal message object to JSON")
+		return
+	}
+
+	log.Info().Msg(string(messageJSON))
+
 	// Find recipient's WebSocket connection
 	recipientConn := userConnections[message.ReceipientID]
 	if recipientConn != nil {
+		log.Info().Str("recipient_connection_address", recipientConn.RemoteAddr().String()).Msg("WebSocket connection for recipient")
 		// Convert message to JSON
 		messageJSON, err := json.Marshal(message)
 		if err != nil {
@@ -190,8 +199,8 @@ func handleWebSocketConnection(c *gin.Context, db *gorm.DB) {
 		handlers.AddMessageWebSocket(db, &receivedMessage)
 
 		// Add user connection to map if not already present
-		if _, ok := userConnections[receivedMessage.ReceipientID]; !ok {
-			userConnections[receivedMessage.ReceipientID] = conn
+		if _, ok := userConnections[receivedMessage.SenderID]; !ok {
+			userConnections[receivedMessage.SenderID] = conn
 		}
 
 		// Broadcast message to recipient

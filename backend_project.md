@@ -41,8 +41,6 @@
 - I have a basic understanding of CICD pipelines
 
 - you have some cloud deployment knowledge
-  
-  
 
 ### Project Idea : Multilanguage chat app (ChatVoyage)
 
@@ -95,3 +93,9 @@
 - Write routes (currently in `main` go file only)
 
 - `swag init` to generate swagger docs 
+
+
+
+### Design
+
+
