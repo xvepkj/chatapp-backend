@@ -98,4 +98,26 @@
 
 ### Design
 
+- User register / login
+  
+  - Login API 
+  
+  - Register API 
 
+- Show user list of existing users with whom he has messages
+  
+  - Friends API **TO DO**
+
+- Show search bar where user can search all users in database
+  
+  - Existing users API **TO DO**
+
+- When user clicks on user he sees chat b/w them and websocket connection is done for instant messaging
+  
+  - Past messages API
+  
+  - Websocket API
+
+- To check if session is still valid
+  
+  - Token validation API **TO DO**
