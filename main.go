@@ -98,8 +98,46 @@ func main() {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	router.GET("/validate-token", ValidateTokenHandler)
+
 	log.Info().Msg("Starting Server...")
 	router.Run()
+}
+
+// ValidateTokenHandler validates the JWT token
+func ValidateTokenHandler(c *gin.Context) {
+	// Get the JWT token from the Authorization header
+	tokenString := c.GetHeader("Authorization")
+	if tokenString == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "missing authorization token"})
+		return
+	}
+
+	// Parse the JWT token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte("signing-key"), nil // Replace "signing-key" with your actual secret key
+	})
+	if err != nil || !token.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired token"})
+		return
+	}
+
+	// Extract user information from the token claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
+		return
+	}
+
+	// Extract any user information you need from the claims
+	username, ok := claims["authenticated_user"].(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username in token"})
+		return
+	}
+
+	// Return a success response if token is valid
+	c.JSON(http.StatusOK, gin.H{"username": username, "message": "Token is valid"})
 }
 
 // authMiddleware is a middleware function to authenticate JWT tokens
