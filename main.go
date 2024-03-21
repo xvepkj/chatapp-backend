@@ -76,6 +76,10 @@ func main() {
 		handlers.GetUserByID(c, db)
 	})
 
+	router.GET("/users", authMiddleware, func(c *gin.Context) {
+		handlers.GetAllUsernames(c, db)
+	})
+
 	router.POST("/messages", authMiddleware, func(c *gin.Context) {
 		handlers.AddMessage(c, db)
 	})

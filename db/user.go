@@ -24,6 +24,14 @@ func UpdateUser(db *gorm.DB, user *models.User) error {
 	return result.Error
 }
 
+func GetAllUsers(db *gorm.DB) ([]models.User, error) {
+	var users []models.User
+	if err := db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func DeleteUser(db *gorm.DB, username string) error {
 	result := db.Where("user_name = ?", username).Delete(&models.User{})
 	return result.Error

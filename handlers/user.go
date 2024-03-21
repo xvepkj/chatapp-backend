@@ -153,3 +153,17 @@ func HashPassword(password string) (string, error) {
 func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
+
+func GetAllUsernames(c *gin.Context, dbConn *gorm.DB) {
+	users, err := db.GetAllUsers(dbConn)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	var usernames []string
+	for _, user := range users {
+		usernames = append(usernames, user.UserName)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": usernames})
+}

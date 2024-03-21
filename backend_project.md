@@ -94,6 +94,8 @@
 
 - `swag init` to generate swagger docs 
 
+- Command to connect to chatapp database `\c chatapp postgres`
+
 
 
 ### Design
