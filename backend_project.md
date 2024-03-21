@@ -112,7 +112,7 @@
 
 - Show search bar where user can search all users in database
   
-  - Existing users API **TO DO**
+  - Existing users API 
 
 - When user clicks on user he sees chat b/w them and websocket connection is done for instant messaging
   
@@ -122,4 +122,4 @@
 
 - To check if session is still valid
   
-  - Token validation API **TO DO**
+  - Token validation API 
