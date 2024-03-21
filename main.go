@@ -100,6 +100,10 @@ func main() {
 
 	router.GET("/validate-token", ValidateTokenHandler)
 
+	router.GET("/friends", authMiddleware, func(c *gin.Context) {
+		handlers.GetUsersSentTo(c, db)
+	})
+
 	log.Info().Msg("Starting Server...")
 	router.Run()
 }

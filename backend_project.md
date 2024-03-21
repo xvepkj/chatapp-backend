@@ -108,7 +108,7 @@
 
 - Show user list of existing users with whom he has messages
   
-  - Friends API **TO DO**
+  - Friends API 
 
 - Show search bar where user can search all users in database
   

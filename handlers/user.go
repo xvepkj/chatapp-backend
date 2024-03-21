@@ -167,3 +167,30 @@ func GetAllUsernames(c *gin.Context, dbConn *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{"users": usernames})
 }
+
+// GetUsersSentTo returns a list of usernames of users to whom the current user has sent messages.
+func GetUsersSentTo(c *gin.Context, db *gorm.DB) {
+	// Get authenticated user's username from the context
+	username, _ := c.Get("authenticated_user")
+
+	// Query the database to get the user object
+	var user models.User
+	if err := db.Preload("SentMessages").Where("user_name = ?", username).First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user"})
+		return
+	}
+
+	// Extract unique usernames of users sent messages to
+	sentTo := make(map[string]bool)
+	for _, msg := range user.SentMessages {
+		sentTo[msg.ReceipientID] = true
+	}
+
+	// Convert map keys to a slice of usernames
+	var usernames []string
+	for username := range sentTo {
+		usernames = append(usernames, username)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": usernames})
+}
