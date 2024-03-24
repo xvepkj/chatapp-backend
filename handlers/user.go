@@ -74,7 +74,7 @@ func GetUser(c *gin.Context, dbConn *gorm.DB) {
 	}
 
 	existingUser.Token = token
-	c.JSON(http.StatusCreated, gin.H{"message": "login successful", "user": existingUser})
+	c.JSON(http.StatusOK, gin.H{"message": "login successful", "user": existingUser})
 }
 
 func generateJWTToken(username string) (string, error) {

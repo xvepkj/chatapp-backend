@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/juju/ratelimit"
@@ -61,6 +62,15 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/"
 
 	router := gin.Default()
+
+	corsMiddleware := cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"}, // Replace with your frontend URL
+		AllowCredentials: true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"*"},
+	})
+
+	router.Use(corsMiddleware)
 
 	router.Use(RateLimitMiddleware())
 
