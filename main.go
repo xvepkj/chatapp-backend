@@ -269,9 +269,7 @@ func handleWebSocketConnection(c *gin.Context, db *gorm.DB) {
 		handlers.AddMessageWebSocket(db, &receivedMessage)
 
 		// Add user connection to map if not already present
-		if _, ok := userConnections[receivedMessage.SenderID]; !ok {
-			userConnections[receivedMessage.SenderID] = conn
-		}
+		userConnections[receivedMessage.SenderID] = conn
 
 		// Broadcast message to recipient
 		sendWebSocketMessage(receivedMessage)
