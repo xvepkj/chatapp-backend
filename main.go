@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -244,7 +243,6 @@ func handleWebSocketConnection(c *gin.Context, db *gorm.DB) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		// Handle error
-		fmt.Println("Failed to upgrade to WebSocket:", err)
 		return
 	}
 	defer conn.Close()
@@ -256,19 +254,16 @@ func handleWebSocketConnection(c *gin.Context, db *gorm.DB) {
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
 				log.Info().Str("error", err.Error()).Msg("Websocket connection closed by client")
-				fmt.Println("WebSocket connection closed by client:", err)
 				break
 			}
-			fmt.Println("Failed to read message from WebSocket:", err)
-			continue
 		}
 
 		// Process received message
 		var receivedMessage models.Message
 		err = json.Unmarshal(p, &receivedMessage)
 		if err != nil {
-			fmt.Println("Failed to unmarshal message:", err)
-			continue
+			// Handle error
+			break
 		}
 
 		handlers.AddMessageWebSocket(db, &receivedMessage)
