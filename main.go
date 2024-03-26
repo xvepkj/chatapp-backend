@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -102,7 +103,7 @@ func main() {
 		handlers.ExportMessagesToExcel(c, db)
 	})
 
-	router.GET("/ws", authMiddleware, func(c *gin.Context) {
+	router.GET("/ws", func(c *gin.Context) {
 		handleWebSocketConnection(c, db)
 	})
 
@@ -218,38 +219,56 @@ func sendWebSocketMessage(message models.Message) {
 		// Send message to recipient
 		err = recipientConn.WriteMessage(websocket.TextMessage, messageJSON)
 		if err != nil {
+			log.Info().Str("Error write message", err.Error())
 			// Handle error
 			return
 		}
 	} else {
+		log.Info().Msg("Receipient not found")
 		// Handle case where recipient is not found
 		return
 	}
 }
 
 func handleWebSocketConnection(c *gin.Context, db *gorm.DB) {
+	log.Info().Msg("Entered handleWebSocketConnection")
 	// Upgrade HTTP connection to WebSocket
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	log.Info().Msg("Entered step 2")
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		// Handle error
+		fmt.Println("Failed to upgrade to WebSocket:", err)
 		return
 	}
 	defer conn.Close()
 
+	log.Info().Msg("Entered step 3")
 	// Read messages from WebSocket connection
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
-			// Handle error
-			break
+			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
+				log.Info().Str("error", err.Error()).Msg("Websocket connection closed by client")
+				fmt.Println("WebSocket connection closed by client:", err)
+				break
+			}
+			fmt.Println("Failed to read message from WebSocket:", err)
+			continue
 		}
 
 		// Process received message
 		var receivedMessage models.Message
 		err = json.Unmarshal(p, &receivedMessage)
 		if err != nil {
-			// Handle error
-			break
+			fmt.Println("Failed to unmarshal message:", err)
+			continue
 		}
 
 		handlers.AddMessageWebSocket(db, &receivedMessage)
